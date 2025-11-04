@@ -63,7 +63,7 @@ flux-bridge    Ready           default        2025-10-31 20:37:53
 
 ## Demo Deployment
 
-We can use a common Helm chart to check if the installation was successful, for example ingress-nginx. First render it into ConfigHub.
+We can use a common Helm chart to check if the installation was successful, for example the reloader helm chart. First render it into ConfigHub.
 
 ```shell
 cub helm install --namespace reloader reloader reloader --repo https://stakater.github.io/stakater-charts
