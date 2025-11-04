@@ -81,13 +81,13 @@ Then apply.
 cub unit apply reloader --wait=false
 ```
 
-Now you can check status in ConfigHub.
+Now you can check status in ConfigHub:
 
 ```shell
 cub unit list
 ```
 
-Or also in Flux.
+and also in Flux:
 
 ```shell
 kubectl get kustomizations -A
