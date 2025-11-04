@@ -109,7 +109,7 @@ spec:
         envFrom:
         - secretRef:
             name: confighub-worker-secret
-        image: ghcr.io/confighubai/flux-bridge:v0.0.2
+        image: ghcr.io/confighubai/flux-bridge:v0.0.4
         imagePullPolicy: IfNotPresent
         name: flux-bridge
         ports:
