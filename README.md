@@ -69,7 +69,7 @@ We can use a common Helm chart to check if the installation was successful, for 
 cub helm install --namespace reloader reloader reloader --repo https://stakater.github.io/stakater-charts
 ```
 
-Then set its target to the target advertized by the flux-bridge for the local cluster.
+Then set its target to the target advertised by the flux-bridge for the local cluster.
 
 ```shell
 cub unit set-target reloader flux-bridge-poc
