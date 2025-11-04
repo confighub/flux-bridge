@@ -1,0 +1,164 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    app: flux-bridge
+  name: confighub
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: flux-bridge
+  name: flux-bridge
+  namespace: confighub
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app: flux-bridge
+  name: flux-bridge
+  namespace: confighub
+rules:
+- apiGroups:
+  - source.toolkit.fluxcd.io
+  resources:
+  - externalartifacts
+  - externalartifacts/status
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - kustomize.toolkit.fluxcd.io
+  resources:
+  - kustomizations
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app: flux-bridge
+  name: flux-bridge
+  namespace: confighub
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: flux-bridge
+subjects:
+- kind: ServiceAccount
+  name: flux-bridge
+  namespace: confighub
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: flux-bridge
+  name: flux-bridge
+  namespace: confighub
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: http
+  selector:
+    app: flux-bridge
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: flux-bridge
+  namespace: confighub
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: flux-bridge
+  name: flux-bridge
+  namespace: confighub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flux-bridge
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: flux-bridge
+    spec:
+      containers:
+      - args:
+        - --data-dir
+        - /data
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        envFrom:
+        - secretRef:
+            name: confighub-worker-secret
+        image: ghcr.io/confighubai/flux-bridge:v0.0.2
+        imagePullPolicy: IfNotPresent
+        name: flux-bridge
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+        resources:
+          limits:
+            cpu: 100m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+        - mountPath: /data
+          name: data
+        - mountPath: /tmp
+          name: tmp
+      serviceAccountName: flux-bridge
+      terminationGracePeriodSeconds: 5
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: flux-bridge
+      - emptyDir: {}
+        name: tmp
