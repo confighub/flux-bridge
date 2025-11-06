@@ -11,7 +11,7 @@ replace github.com/opencontainers/go-digest => github.com/opencontainers/go-dige
 
 require (
 	github.com/alexflint/go-arg v1.6.0
-	github.com/confighub/sdk v0.0.0-20251029234451-09d156b7f61a
+	github.com/confighub/sdk v0.0.0-20251105021936-48876ecca35d
 	github.com/fluxcd/cli-utils v0.36.0-flux.15
 	github.com/fluxcd/kustomize-controller/api v1.7.2
 	github.com/fluxcd/pkg/apis/meta v1.22.0
